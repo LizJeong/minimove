@@ -60,14 +60,14 @@ jobs:
           && cd ./build \
           && cp ~/go/pkg/mod/github.com/initia-labs/movevm@${MOVEVM_VERSION}/api/libmovevm.dylib ./ \
           && cp ~/go/pkg/mod/github.com/initia-labs/movevm@${MOVEVM_VERSION}/api/libcompiler.dylib ./ \
-          && tar -czvf minitia_"$VERSION"_Darwin_"$ARCH_NAME".tar.gz minitiad libmovevm.dylib libcompiler.dylib \
-          && mv ./minitia_"$VERSION"_Darwin_"$ARCH_NAME".tar.gz $GITHUB_WORKSPACE/ \
+          && tar -czvf minimove_"$VERSION"_Darwin_"$ARCH_NAME".tar.gz minitiad libmovevm.dylib libcompiler.dylib \
+          && mv ./minimove_"$VERSION"_Darwin_"$ARCH_NAME".tar.gz $GITHUB_WORKSPACE/ \
           && rm -rf ./libmovevm.dylib ./libcompiler.dylib ./minitiad
   
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            minitia_${{ env.VERSION }}_Darwin_${{ env.ARCH_NAME }}.tar.gz
+            minimove_${{ env.VERSION }}_Darwin_${{ env.ARCH_NAME }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
