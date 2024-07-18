@@ -1,16 +1,14 @@
 name: Build Darwin ARM64
+
 on:
   workflow_call:
-    inputs:
-      arch:
-        required: true
-        type: string
+
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Go
@@ -21,10 +19,9 @@ jobs:
         run: |
           MINIMOVE_NETWORK_NAME="minimove-1"
           echo "MINIMOVE_NETWORK_NAME=${MINIMOVE_NETWORK_NAME}" >> $GITHUB_ENV
-          # Read MOVEVM_VERSION from config file
           MOVEVM_VERSION=$(go list -m github.com/initia-labs/movevm | awk '{print $2}')    
           echo "MOVEVM_VERSION=${MOVEVM_VERSION}" >> $GITHUB_ENV        
-          echo "GOARCH=${{ inputs.arch }}" >> $GITHUB_ENV
+          echo "GOARCH=arm64" >> $GITHUB_ENV
           echo "GOOS=darwin" >> $GITHUB_ENV
           if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
             VERSION=${GITHUB_REF#refs/tags/}
@@ -32,13 +29,7 @@ jobs:
             VERSION="v0.0.0-${GITHUB_SHA::8}"
           fi
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
-          if [ "${{ inputs.arch }}" == "amd64" ]; then
-            echo "ARCH_NAME=x86_64" >> $GITHUB_ENV
-          elif [ "${{ inputs.arch }}" == "arm64" ]; then
-            echo "ARCH_NAME=aarch64" >> $GITHUB_ENV
-          else
-            echo "ARCH_NAME=${{ inputs.arch }}" >> $GITHUB_ENV
-          fi
+          echo "ARCH_NAME=aarch64" >> $GITHUB_ENV
           
       - name: Ensure dependencies
         run: |
@@ -60,14 +51,13 @@ jobs:
           && cd ./build \
           && cp ~/go/pkg/mod/github.com/initia-labs/movevm@${MOVEVM_VERSION}/api/libmovevm.dylib ./ \
           && cp ~/go/pkg/mod/github.com/initia-labs/movevm@${MOVEVM_VERSION}/api/libcompiler.dylib ./ \
-          && tar -czvf minimove_"$VERSION"_Darwin_"$ARCH_NAME".tar.gz minitiad libmovevm.dylib libcompiler.dylib \
-          && mv ./minimove_"$VERSION"_Darwin_"$ARCH_NAME".tar.gz $GITHUB_WORKSPACE/ \
+          && tar -czvf minimove"$VERSION"_Darwin_"$ARCH_NAME".tar.gz minitiad libmovevm.dylib libcompiler.dylib \
+          && mv ./minimove"$VERSION"_Darwin_"$ARCH_NAME".tar.gz $GITHUB_WORKSPACE/ \
           && rm -rf ./libmovevm.dylib ./libcompiler.dylib ./minitiad
   
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
-            minimove_${{ env.VERSION }}_Darwin_${{ env.ARCH_NAME }}.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
+            minimove${{ env.VERSION }}_Darwin_${{ env.ARCH_NAME }}.tar.gz
+            
