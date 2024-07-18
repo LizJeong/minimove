@@ -1,16 +1,14 @@
 name: Build Darwin AMD64
+
 on:
   workflow_call:
-    inputs:
-      arch:
-        required: true
-        type: string
+
 jobs:
   build:
     runs-on: macos-13
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -23,7 +21,7 @@ jobs:
         run: |
           MINIMOVE_NETWORK_NAME="minimove-1"
           echo "MINIMOVE_NETWORK_NAME=${MINIMOVE_NETWORK_NAME}" >> $GITHUB_ENV        
-          echo "GOARCH=${{ inputs.arch }}" >> $GITHUB_ENV
+          echo "GOARCH=amd64" >> $GITHUB_ENV
           echo "GOOS=darwin" >> $GITHUB_ENV
           if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
             VERSION=${GITHUB_REF#refs/tags/}
@@ -32,7 +30,6 @@ jobs:
           fi
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "ARCH_NAME=x86_64" >> $GITHUB_ENV
-          # Read MOVEVM_VERSION from config file
           MOVEVM_VERSION=$(go list -m github.com/initia-labs/movevm | awk '{print $2}')    
           echo "MOVEVM_VERSION=${MOVEVM_VERSION}" >> $GITHUB_ENV        
 
@@ -62,9 +59,8 @@ jobs:
           && rm -rf ./libmovevm.dylib ./libcompiler.dylib ./minitiad
   
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             minimove_${{ env.VERSION }}_Darwin_${{ env.ARCH_NAME }}.tar.gz
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
+            
