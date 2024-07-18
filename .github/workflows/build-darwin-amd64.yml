@@ -52,7 +52,7 @@ jobs:
 
       - name: Build and Package for Darwin ADM64
         run: |
-          cd ../initia \
+          cd ../minimove \
           && make build \
           && cd ./build \
           && cp ~/go/pkg/mod/github.com/initia-labs/movevm@${MOVEVM_VERSION}/api/libmovevm.dylib ./ \
