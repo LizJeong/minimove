@@ -2,7 +2,8 @@ name: Build Darwin AMD64
 
 on:
   workflow_call:
-
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: macos-13
